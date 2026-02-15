@@ -2,5 +2,30 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": []
+  "references": [
+    {
+      "path": "./libs/shared/contracts"
+    },
+    {
+      "path": "./libs/shared/infra"
+    },
+    {
+      "path": "./libs/shared/common"
+    },
+    {
+      "path": "./libs/shared/common"
+    },
+    {
+      "path": "./libs/shared/contracts"
+    },
+    {
+      "path": "./libs/shared/common"
+    },
+    {
+      "path": "./libs/shared/infra"
+    },
+    {
+      "path": "./libs/shared/ui"
+    }
+  ]
 }
