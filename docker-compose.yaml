@@ -1,0 +1,57 @@
+services:
+  # --- DATABASES ---
+  user-db:
+    image: postgres:15-alpine
+    container_name: user_db
+    restart: always
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_DB: ${USER_DB_NAME}
+      POSTGRES_USER: ${USER_DB_USER}
+      POSTGRES_PASSWORD: ${USER_DB_PASS}
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+
+  auth-db:
+    image: postgres:15-alpine
+    container_name: auth_db
+    restart: always
+    ports:
+      - '5434:5432'
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASS}
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+
+  # --- REDIS (Один на всех) ---
+  redis:
+    image: redis:7-alpine
+    container_name: redis_storage
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+
+  # --- KAFKA (Single Node / KRaft mode) ---
+  # Используем современный образ без Zookeeper для простоты
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka_broker
+    ports:
+      - '9092:9092'
+    environment:
+      # Настройки для работы внутри и снаружи докера
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+volumes:
+  user_db_data:
+  auth_db_data:
